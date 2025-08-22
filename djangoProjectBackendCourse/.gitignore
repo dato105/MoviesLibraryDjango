@@ -1,7 +1,7 @@
 # Environment variables
-.env
+movies/.env
 
 # Django
-media/
+movies/media/
 
 .idea
