@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Movie Library{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'library/dashboard.css' %}">
+
+<div class="dashboard-container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <p>Manage your movie library and reviews</p>
+            <div class="admin-badge">
+                <span>Welcome, {{ user.username }} (Admin)</span>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-icon">🎬</div>
+                <div class="stat-info">
+                    <h3>{{ total_movies }}</h3>
+                    <p>Total Movies</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-info">
+                    <h3>{{ total_reviews }}</h3>
+                    <p>Total Reviews</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <h3>{{ total_users }}</h3>
+                    <p>Total Users</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CRUD Actions -->
+        <div class="crud-section">
+            <h2>Movie Management</h2>
+            
+            <!-- Add New Movie -->
+            <div class="crud-card add-movie">
+                <div class="crud-header">
+                    <h3>Add New Movie</h3>
+                    <div class="crud-icon add">➕</div>
+                </div>
+                <p>Add a new movie to the library with poster, details, and information.</p>
+                <a href="{% url 'library:add_movie' %}" class="crud-btn primary">Add Movie</a>
+            </div>
+
+
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="actions-grid">
+                <a href="{% url 'admin:index' %}" class="action-item">
+                    <div class="action-icon">⚙️</div>
+                    <span>Django Admin</span>
+                </a>
+                <a href="{% url 'library:all_movies' %}" class="action-item">
+                    <div class="action-icon">📚</div>
+                    <span>View Library</span>
+                </a>
+                <a href="{% url 'library:all_reviews' %}" class="action-item">
+                    <div class="action-icon">💬</div>
+                    <span>View Reviews</span>
+                </a>
+            </div>
+        </div>
+
+</div>
+
+{% endblock %}

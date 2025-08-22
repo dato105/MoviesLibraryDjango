@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ movie.title }} - Reviews{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'library/movie_reviews.css' %}">
+
+<div class="reviews-page-container">
+    <!-- Back Button -->
+    <div class="back-navigation">
+        <a href="{% url 'library:movie_detail' movie.id %}" class="back-btn">
+            <span class="back-arrow">←</span> Back to Movie Details
+        </a>
+    </div>
+
+    <!-- Page Header -->
+    <div class="reviews-page-header">
+        <h1>Movie Reviews</h1>
+        <p>See what others think about this movie</p>
+    </div>
+
+    <!-- Movie Reviews Card -->
+    <div class="movie-reviews-card">
+        <!-- Movie Info Section -->
+        <div class="movie-info-header">
+            <div class="movie-poster-container">
+                {% if movie.poster %}
+                    <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="reviews-movie-poster">
+                {% else %}
+                    <div class="no-poster-reviews">
+                        <span>No Poster</span>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="movie-basic-info">
+                <h2 class="movie-title">{{ movie.title }}</h2>
+                <p class="movie-year">{{ movie.year_of_release }}</p>
+                <p class="movie-director">Directed by {{ movie.director }}</p>
+                
+                <div class="rating-summary">
+                    {% if movie.reviews.exists %}
+                        <div class="average-rating">
+                            <span class="star-large">★</span>
+                            <span class="rating-value">{{ movie.average_rating|floatformat:1 }}/5</span>
+                            <span class="total-reviews">({{ movie.reviews.count }} review{{ movie.reviews.count|pluralize }})</span>
+                        </div>
+                    {% else %}
+                        <div class="no-ratings">
+                            <span>No ratings yet</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'library:movie_detail' movie.id %}#reviewForm" class="write-review-link">
+                        Write a Review
+                    </a>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="login-to-review">
+                        Login to Write Review
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="reviews-container">
+            <div class="reviews-header">
+                <h3>All Reviews</h3>
+                <div class="reviews-count">{{ movie.reviews.count }} Review{{ movie.reviews.count|pluralize }}</div>
+            </div>
+
+            <div class="reviews-scroll-area">
+                {% for review in movie.reviews.all %}
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-details">
+                                <div class="reviewer-avatar">
+                                    <span>{{ review.reviewer_name|first|upper }}</span>
+                                </div>
+                                <div class="reviewer-info">
+                                    <span class="reviewer-name">{{ review.reviewer_name }}</span>
+                                    <span class="review-date">{{ review.review_date|date:"F d, Y" }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="review-rating">
+                                <div class="stars-display">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <span class="star filled">★</span>
+                                        {% else %}
+                                            <span class="star empty">☆</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="rating-number">{{ review.rating }}/5</span>
+                            </div>
+                        </div>
+                        
+                        <div class="review-content">
+                            <p>{{ review.review_text }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="no-reviews-message">
+                        <div class="no-reviews-icon">📝</div>
+                        <h4>No Reviews Yet</h4>
+                        <p>Be the first to share your thoughts about this movie!</p>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'library:movie_detail' movie.id %}#reviewForm" class="first-review-btn">
+                                Write the First Review
+                            </a>
+                        {% else %}
+                            <a href="{% url 'users:login' %}" class="login-first-review">
+                                Login to Write First Review
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Actions -->
+    <div class="page-actions">
+        <a href="{% url 'library:all_movies' %}" class="action-btn secondary">
+            Browse More Movies
+        </a>
+        <a href="{% url 'library:movie_detail' movie.id %}" class="action-btn primary">
+            View Movie Details
+        </a>
+    </div>
+</div>
+{% endblock %}

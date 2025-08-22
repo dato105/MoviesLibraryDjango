@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Movie AI Chat - MovieDB{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'library/chat.css' %}">
+
+<div class="chat-container">
+    <!-- Chat Header -->
+    <div class="chat-header">
+        <h1>Movie AI Assistant</h1>
+        <p>Ask me anything about movies in our collection</p>
+        <div class="chat-stats">
+            <span class="stat-badge">{{ total_movies|default:0 }} Movies</span>
+            <span class="stat-badge">{{ total_reviews|default:0 }} Reviews</span>
+        </div>
+    </div>
+
+    <!-- Chat Wrapper -->
+    <div class="chat-wrapper">
+        <!-- Chat Messages Area -->
+        <div class="chat-messages" id="chatMessages">
+            <!-- Welcome Message -->
+            <div class="message ai-message">
+                <div class="message-avatar">
+                    <div class="avatar-icon">🤖</div>
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="sender-name">Movie AI</span>
+                        <span class="message-time">Just now</span>
+                    </div>
+                    <div class="message-text">
+                        Welcome! I'm your movie assistant. I can help you discover amazing films from our collection. Try asking me about:
+                    </div>
+                    <div class="suggestions">
+                        <form method="post" action="{% url 'library:chat' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="message" value="What are the highest rated movies?">
+                            <button type="submit" class="suggestion-btn">⭐ Top Rated Movies</button>
+                        </form>
+                        <form method="post" action="{% url 'library:chat' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="message" value="Show me action movies">
+                            <button type="submit" class="suggestion-btn">🎬 Action Movies</button>
+                        </form>
+                        <form method="post" action="{% url 'library:chat' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="message" value="Surprise me with your recommendations">
+                            <button type="submit" class="suggestion-btn">💡 Surprise Me</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            {% if error_message %}
+            <div class="message ai-message">
+                <div class="message-avatar">
+                    <div class="avatar-icon">⚠️</div>
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="sender-name">System</span>
+                        <span class="message-time">Now</span>
+                    </div>
+                    <div class="message-text" style="color: #ff6b6b;">{{ error_message }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- User Message (if exists) -->
+            {% if user_message %}
+            <div class="message user-message">
+                <div class="message-avatar">
+                    <div class="avatar-icon">👤</div>
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="sender-name">You</span>
+                        <span class="message-time">Just now</span>
+                    </div>
+                    <div class="message-text">{{ user_message }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- AI Response with Movie Recommendations -->
+            {% if ai_response %}
+            <div class="message ai-message">
+                <div class="message-avatar">
+                    <div class="avatar-icon">🤖</div>
+                </div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="sender-name">Movie AI</span>
+                        <span class="message-time">Now</span>
+                    </div>
+                    <div class="message-text">{{ ai_response|safe }}</div>
+
+                    {% if recommended_movies %}
+                    <div class="movie-recommendations">
+                        {% for movie in recommended_movies %}
+                        <div class="movie-card">
+                            <a href="{% url 'library:movie_detail' movie.id %}" class="movie-link">
+                                <div class="movie-poster">
+                                    {% if movie.poster %}
+                                        <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="poster-image">
+                                    {% else %}
+                                        <div class="no-poster">
+                                            <span>🎬</span>
+                                        </div>
+                                    {% endif %}
+                                    <div class="movie-year">{{ movie.year_of_release }}</div>
+                                </div>
+
+                                <div class="movie-info">
+                                    <h3 class="movie-title">{{ movie.title }}</h3>
+                                    <p class="movie-director">Directed by {{ movie.director }}</p>
+                                    <p class="movie-description">{{ movie.description|truncatewords:10 }}</p>
+
+                                    <div class="movie-meta">
+                                        <div class="movie-rating">
+                                            {% if movie.reviews.exists %}
+                                                <span class="star">★</span>
+                                                <span class="rating-value">{{ movie.average_rating|floatformat:1 }}/5</span>
+                                                <span class="review-count">({{ movie.reviews.count }} reviews)</span>
+                                            {% else %}
+                                                <span class="no-rating">No ratings yet</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="movie-overlay">
+                                    <div class="overlay-content">
+                                        <span class="view-details">View Details</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator" style="display: none;">
+            <div class="message-avatar">
+                <div class="avatar-icon">🤖</div>
+            </div>
+            <div class="typing-content">
+                <div class="typing-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <span class="typing-text">AI is thinking...</span>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-container">
+                            <form class="chat-form" method="post" action="{% url 'library:chat' %}">
+                {% csrf_token %}
+                <div class="input-wrapper">
+                    <input
+                        type="text"
+                        class="chat-input"
+                        name="message"
+                        placeholder="Ask about movies... (e.g., 'Show me sci-fi movies')"
+                        autocomplete="off"
+                        maxlength="500"
+                        required
+                    >
+                    <button type="submit" class="send-button">
+                        <span class="button-text">Send</span>
+                        <span class="button-icon">➤</span>
+                    </button>
+                </div>
+                <div class="input-footer">
+                    <span class="input-hint">Type your movie question and press Enter</span>
+                    <span class="powered-by">Powered by Gemini AI</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Chat Footer -->
+    <div class="chat-footer">
+        <p>🎬 Discover your next favorite movie with AI assistance</p>
+    </div>
+</div>
+{% endblock %}

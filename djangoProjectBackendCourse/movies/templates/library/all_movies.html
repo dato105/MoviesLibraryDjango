@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Movie Library - All Movies{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'library/all_movies.css' %}">
+
+<div class="movies-container">
+    <div class="movies-header">
+        <h1>Movie Library</h1>
+        <p>Discover amazing movies and explore their details</p>
+        <div class="movies-count">
+            <span>{{ movies.count }} Movies Available</span>
+        </div>
+    </div>
+
+    <div class="movies-grid">
+        {% for movie in movies %}
+            <div class="movie-card">
+                <a href="{% url 'library:movie_detail' movie.id %}" class="movie-link">
+                    <div class="movie-poster">
+                        {% if movie.poster %}
+                            <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="poster-image">
+                        {% else %}
+                            <div class="no-poster">
+                                <span>No Poster</span>
+                            </div>
+                        {% endif %}
+                        <div class="movie-year">{{ movie.year_of_release }}</div>
+                    </div>
+
+                    <div class="movie-info">
+                        <h3 class="movie-title">{{ movie.title }}</h3>
+                        <p class="movie-director">Directed by {{ movie.director }}</p>
+                        <p class="movie-description">{{ movie.description|truncatewords:15 }}</p>
+
+                         <div class="movie-meta">
+                            <div class="movie-rating">
+                                {% if movie.reviews.exists %}
+                                    <span class="star">★</span>
+                                    <span class="rating-value">
+                                        {% widthratio movie.reviews.all|length movie.reviews.all|length 1 as avg_rating %}
+                                        {{ movie.average_rating|floatformat:1 }}/5
+                                    </span>
+                                    <span class="review-count">({{ movie.reviews.count }} reviews)</span>
+                                {% else %}
+                                    <span class="no-rating">No ratings yet</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="movie-overlay">
+                        <div class="overlay-content">
+                            <span class="view-details">View Details</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% empty %}
+            <div class="no-movies">
+                <div class="no-movies-content">
+                    <h2>No Movies Available</h2>
+                    <p>There are currently no movies in the library.</p>
+                    {% if user.is_staff %}
+                        <a href="{% url 'admin:index' %}" class="add-movie-btn">Add Movies</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if movies %}
+        <div class="movies-footer">
+            <p>Enjoy exploring our movie collection!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

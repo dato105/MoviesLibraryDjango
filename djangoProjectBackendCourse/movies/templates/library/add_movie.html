@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Movie - Admin Dashboard{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'library/add_movie.css' %}">
+
+<div class="add-movie-container">
+    <!-- Back Navigation -->
+    <div class="back-navigation">
+        <a href="{% url 'library:dashboard' %}" class="back-btn">
+            <span class="back-arrow">←</span> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Page Header -->
+    <div class="add-movie-header">
+        <h1>Add New Movie</h1>
+        <p>Add a new movie to your library</p>
+    </div>
+
+
+    <!-- Movie Form -->
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data" class="movie-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}">Movie Title *</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="field-errors">
+                        {% for error in form.title.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label for="{{ form.director.id_for_label }}">Director *</label>
+                    {{ form.director }}
+                    {% if form.director.errors %}
+                        <div class="field-errors">
+                            {% for error in form.director.errors %}
+                                <span class="error-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group half-width">
+                    <label for="{{ form.year_of_release.id_for_label }}">Release Year *</label>
+                    {{ form.year_of_release }}
+                    {% if form.year_of_release.errors %}
+                        <div class="field-errors">
+                            {% for error in form.year_of_release.errors %}
+                                <span class="error-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.four_main_actors.id_for_label }}">Main Actors *</label>
+                {{ form.four_main_actors }}
+                <small class="help-text">Enter the main actors separated by commas</small>
+                {% if form.four_main_actors.errors %}
+                    <div class="field-errors">
+                        {% for error in form.four_main_actors.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">Description *</label>
+                {{ form.description }}
+                <small class="help-text">Maximum 300 characters</small>
+                {% if form.description.errors %}
+                    <div class="field-errors">
+                        {% for error in form.description.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.poster.id_for_label }}">Movie Poster</label>
+                {{ form.poster }}
+                <small class="help-text">Upload an image file (JPG, PNG, etc.)</small>
+                {% if form.poster.errors %}
+                    <div class="field-errors">
+                        {% for error in form.poster.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">Add Movie</button>
+                <a href="{% url 'library:dashboard' %}" class="cancel-btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Movie Library{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- Left side navigation -->
+            <div class="nav-left">
+                <div class="nav-logo">
+                    <a href="{% url 'library:all_movies' %}" class="logo-link">MovieLib</a>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="{% url 'library:all_movies' %}" class="nav-link">Library</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'library:all_reviews' %}" class="nav-link">Reviews</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'library:dashboard' %}" class="nav-link">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'library:chat' %}" class="nav-link">🤖 Movie Chat</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Right side navigation -->
+            <div class="nav-right">
+                {% if user.is_authenticated %}
+                    <div class="user-menu">
+                        <span class="welcome-user">Welcome, {{ user.username }}</span>
+                        <a href="{% url 'users:logout' %}" class="nav-btn logout-btn">Logout</a>
+                    </div>
+                {% else %}
+                    <div class="auth-buttons">
+                        <a href="{% url 'users:login' %}" class="nav-btn login-btn">Login</a>
+                        <a href="{% url 'users:signup' %}" class="nav-btn register-btn">Sign Up</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 MovieLib. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
